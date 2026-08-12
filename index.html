@@ -1,9 +1,9 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>億家 AI Studio v0.5</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>億家 AI Studio v0.6</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
 body{margin:0;background:#0d0f0e;color:#f5f7f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box}button,input,textarea,select{font:inherit}.app{max-width:900px;margin:auto;padding:18px 14px 80px}.brand{display:flex;gap:12px;align-items:center;margin-bottom:18px}.mark{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:24px;font-weight:900;background:linear-gradient(135deg,#ff8a00,#fff 50%,#38b66a);color:#111}.panel,.scene{background:#151916;border:1px solid #2c332e;border-radius:16px;padding:16px;margin-bottom:12px}.muted{color:#929b95;font-size:13px}textarea,input,select{width:100%;background:#0f1210;border:1px solid #343b36;color:#fff;border-radius:9px;padding:10px}textarea{min-height:78px}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}button{border:1px solid #343b36;background:#1b201c;color:#fff;border-radius:9px;padding:11px}.primary{background:#52c675;color:#07120a;border-color:#52c675;font-weight:800}.hidden{display:none}.status{padding:10px;border-radius:9px;background:#17231b;color:#aee6bb;margin-top:10px}.error{background:#2b1818;color:#ffb9b9}.scene label{display:block;color:#a0a8a2;font-size:12px;margin:10px 0 5px}.preview{height:170px;background:#0a0c0b;border-radius:10px;display:grid;place-items:center;overflow:hidden;margin-bottom:10px}.preview img{width:100%;height:100%;object-fit:cover}.timeline{display:flex;gap:5px;overflow:auto}.clip{min-width:70px;background:#284f34;border:1px solid #3d6948;border-radius:8px;padding:9px;display:flex;justify-content:space-between}.projectItem{border:1px solid #303832;border-radius:10px;padding:10px;margin-top:8px;display:flex;justify-content:space-between;gap:8px;align-items:center}.mini{padding:9px 10px;font-size:14px}.aiBar{display:flex;gap:8px;margin-top:8px}.imgStatus{margin-top:8px;color:#9bd8a9;font-size:12px}.imgError{color:#ffb9b9}.loading{opacity:.7;pointer-events:none}
 .videoStage{position:relative;aspect-ratio:16/9;background:#050605;border-radius:14px;overflow:hidden;display:grid;place-items:center;margin-top:12px}.videoStage img{width:100%;height:100%;object-fit:cover;transform:scale(1);transition:transform 4s linear}.videoStage.zoom img{transform:scale(1.08)}.videoStage.pan img{transform:scale(1.05) translateX(-2%)}.videoPlaceholder{color:#7f8b82;text-align:center;padding:20px}.videoSubtitle{position:absolute;left:5%;right:5%;bottom:6%;background:rgba(0,0,0,.62);padding:10px 12px;border-radius:10px;text-align:center;font-size:18px;font-weight:700;text-shadow:0 1px 2px #000}.videoMeta{display:flex;justify-content:space-between;gap:10px;margin-top:10px;color:#9aa39d;font-size:13px}.progress{height:7px;background:#222923;border-radius:999px;overflow:hidden;margin-top:10px}.progress>div{height:100%;width:0;background:#52c675;transition:width .2s linear}.previewControls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.previewControls button{flex:1;min-width:120px}.voiceRow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}@media(max-width:520px){.voiceRow{grid-template-columns:1fr}.videoSubtitle{font-size:15px}}
 @media(min-width:700px){#scenes{display:grid;grid-template-columns:1fr 1fr;gap:12px}.scene{margin:0}}
 </style></head><body><div class="app">
-<div class="brand"><div class="mark">億</div><div><h2 style="margin:0">億家 AI Studio</h2><div class="muted">v0.5 影片預覽版</div></div></div>
+<div class="brand"><div class="mark">億</div><div><h2 style="margin:0">億家 AI Studio</h2><div class="muted">v0.6 MP4 影片輸出版</div></div></div>
 
 <div class="panel"><h3>Supabase 連線設定</h3><p class="muted">貼上你自己的 Project URL 與 Publishable key。只會儲存在這支瀏覽器。</p><input id="sbUrl" placeholder="https://xxxx.supabase.co"><input id="sbKey" placeholder="sb_publishable_..." style="margin-top:8px"><div class="row" style="margin-top:8px"><button class="primary" onclick="saveConfig()">儲存並連線</button><button onclick="clearConfig()">清除</button></div><div id="setupStatus" class="status hidden"></div></div>
 
@@ -16,7 +16,7 @@ body{margin:0;background:#0d0f0e;color:#f5f7f5;font-family:-apple-system,BlinkMa
 <div class="panel row"><button onclick="addScene()">＋ 新增場景</button><button onclick="speakAll()">🔊 旁白預覽</button><button onclick="saveLocal(true)">💾 本機儲存</button></div>
 <div id="scenes"></div>
 <div class="panel"><h3>時間軸</h3><div id="timeline" class="timeline"></div></div>
-<div class="panel"><h3>🎬 影片預覽</h3><p class="muted">會依照每個場景的秒數，自動播放圖片、字幕與旁白。這是手機上的預覽，還不是 MP4 匯出。</p><div id="videoStage" class="videoStage"><div class="videoPlaceholder">上傳場景圖片後，按下方「開始預覽」</div><div id="videoSubtitle" class="videoSubtitle hidden"></div></div><div class="videoMeta"><span id="videoSceneLabel">尚未播放</span><span id="videoTimeLabel">0 / 0 秒</span></div><div class="progress"><div id="videoProgress"></div></div><div class="voiceRow"><div><label class="muted">旁白速度</label><select id="voiceRate"><option value="0.85">慢</option><option value="1" selected>正常</option><option value="1.15">稍快</option></select></div><div><label class="muted">旁白</label><select id="voiceToggle"><option value="on" selected>開啟</option><option value="off">關閉</option></select></div></div><div class="previewControls"><button class="primary" onclick="startVideoPreview()">▶️ 開始預覽</button><button onclick="pauseVideoPreview()">⏸️ 暫停</button><button onclick="stopVideoPreview()">⏹️ 停止</button></div></div><div class="panel"><h3>影片輸出</h3><p class="muted">下一階段才會加入 MP4 輸出。現在可先確認圖片順序、秒數、字幕與旁白。</p><button onclick="downloadProject()">📦 匯出專案 JSON</button></div>
+<div class="panel"><h3>🎬 影片預覽</h3><p class="muted">會依照每個場景的秒數，自動播放圖片、字幕與旁白。這是手機上的預覽，還不是 MP4 匯出。</p><div id="videoStage" class="videoStage"><div class="videoPlaceholder">上傳場景圖片後，按下方「開始預覽」</div><div id="videoSubtitle" class="videoSubtitle hidden"></div></div><div class="videoMeta"><span id="videoSceneLabel">尚未播放</span><span id="videoTimeLabel">0 / 0 秒</span></div><div class="progress"><div id="videoProgress"></div></div><div class="voiceRow"><div><label class="muted">旁白速度</label><select id="voiceRate"><option value="0.85">慢</option><option value="1" selected>正常</option><option value="1.15">稍快</option></select></div><div><label class="muted">旁白</label><select id="voiceToggle"><option value="on" selected>開啟</option><option value="off">關閉</option></select></div></div><div class="previewControls"><button class="primary" onclick="startVideoPreview()">▶️ 開始預覽</button><button onclick="pauseVideoPreview()">⏸️ 暫停</button><button onclick="stopVideoPreview()">⏹️ 停止</button></div></div><div class="panel"><h3>📹 影片輸出</h3><p class="muted">把目前場景圖片、秒數、字幕與運鏡直接合成影片。Safari 支援時優先輸出 MP4；若裝置不支援 MP4，會自動改用 WebM。系統語音旁白目前只用於預覽，不會錄進輸出影片。</p><div class="voiceRow"><div><label class="muted">輸出畫質</label><select id="exportQuality"><option value="720" selected>720p（手機建議）</option><option value="1080">1080p</option></select></div><div><label class="muted">每秒影格</label><select id="exportFps"><option value="24">24 fps</option><option value="30" selected>30 fps</option></select></div></div><div class="previewControls"><button id="exportBtn" class="primary" onclick="exportVideo()">🎬 產生影片</button><button onclick="downloadProject()">📦 匯出專案 JSON</button></div><div id="exportStatus" class="status hidden"></div><div class="progress"><div id="exportProgress"></div></div><canvas id="exportCanvas" class="hidden"></canvas></div>
 </div>
 <script>
 const LOCAL='yijia-ai-v04',CFG='yijia-ai-sb';
@@ -60,5 +60,68 @@ function setPreviewScene(scene,index,total){applyStageRatio();const stage=$('vid
 async function startVideoPreview(){if(!state.scenes.length)return alert('目前沒有場景');previewRunId++;const runId=previewRunId;previewPaused=false;clearTimeout(previewTimer);speechSynthesis?.cancel?.();currentPreviewIndex=0;const totalSec=state.scenes.reduce((a,s)=>a+(Number(s.duration)||1),0);let elapsed=0;for(let i=0;i<state.scenes.length;i++){if(runId!==previewRunId)return;currentPreviewIndex=i;const s=state.scenes[i],dur=Math.max(1,Number(s.duration)||1);setPreviewScene(s,i,state.scenes.length);previewSpeak(s.narration,dur);let spent=0;while(spent<dur*1000){if(runId!==previewRunId)return;if(previewPaused){await sleep(150);continue}await sleep(100);spent+=100;elapsed+=.1;$('videoProgress').style.width=Math.min(100,(elapsed/totalSec)*100)+'%';$('videoTimeLabel').textContent=Math.floor(elapsed)+' / '+Math.floor(totalSec)+' 秒'}speechSynthesis?.cancel?.()}if(runId===previewRunId){$('videoSceneLabel').textContent='預覽完成';$('videoTimeLabel').textContent=Math.floor(totalSec)+' / '+Math.floor(totalSec)+' 秒';$('videoProgress').style.width='100%'}}
 function pauseVideoPreview(){previewPaused=!previewPaused;if(previewPaused){speechSynthesis?.pause?.();$('videoSceneLabel').textContent+='（已暫停）'}else{speechSynthesis?.resume?.()}}
 function stopVideoPreview(){previewRunId++;previewPaused=false;clearTimeout(previewTimer);speechSynthesis?.cancel?.();$('videoProgress').style.width='0%';$('videoTimeLabel').textContent='0 / 0 秒';$('videoSceneLabel').textContent='已停止';const stage=$('videoStage');stage.classList.remove('zoom','pan');stage.innerHTML='<div class="videoPlaceholder">上傳場景圖片後，按下方「開始預覽」</div><div id="videoSubtitle" class="videoSubtitle hidden"></div>'}
+
+function pickVideoMime(){
+  const types=[
+    'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+    'video/mp4;codecs=avc1.42E01E',
+    'video/mp4',
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8',
+    'video/webm'
+  ];
+  return types.find(t=>window.MediaRecorder?.isTypeSupported?.(t))||'';
+}
+function waitImage(src){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=src})}
+function drawCover(ctx,img,cw,ch,zoom=1,pan=0){
+  const ir=img.width/img.height,cr=cw/ch;let sw,sh,sx,sy;
+  if(ir>cr){sh=img.height;sw=sh*cr;sx=(img.width-sw)/2;sy=0}else{sw=img.width;sh=sw/cr;sx=0;sy=(img.height-sh)/2}
+  const z=Math.max(1,zoom);const zw=sw/z,zh=sh/z;const px=Math.max(-1,Math.min(1,pan))*((sw-zw)/2);sx+=(sw-zw)/2+px;sy+=(sh-zh)/2;
+  ctx.drawImage(img,sx,sy,zw,zh,0,0,cw,ch)
+}
+function roundRect(ctx,x,y,w,h,r){r=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function wrapLines(ctx,text,maxWidth){const chars=[...String(text||'')],lines=[];let line='';for(const c of chars){const test=line+c;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=c}else line=test}if(line)lines.push(line);return lines.slice(0,3)}
+function drawSubtitle(ctx,text,w,h){if(!text)return;const fs=Math.max(28,Math.round(h*0.045));ctx.font=`700 ${fs}px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';const max=w*.84,lines=wrapLines(ctx,text,max),lh=fs*1.35,bh=lines.length*lh+fs*.7,bw=Math.min(w*.92,Math.max(...lines.map(x=>ctx.measureText(x).width),200)+fs*1.2),x=(w-bw)/2,y=h-bh-h*.055;ctx.fillStyle='rgba(0,0,0,.66)';roundRect(ctx,x,y,bw,bh,fs*.35);ctx.fill();ctx.fillStyle='#fff';ctx.shadowColor='rgba(0,0,0,.8)';ctx.shadowBlur=4;lines.forEach((line,i)=>ctx.fillText(line,w/2,y+fs*.55+lh*(i+.45)));ctx.shadowBlur=0}
+async function exportVideo(){
+  if(!state.scenes.length)return alert('目前沒有場景');
+  const scenes=state.scenes.filter(s=>s.image);
+  if(!scenes.length)return alert('請先上傳至少一張場景圖片');
+  if(!window.MediaRecorder)return alert('這個瀏覽器目前不支援影片輸出，請改用 Safari 最新版本。');
+  const canvas=$('exportCanvas'),ctx=canvas.getContext('2d',{alpha:false});
+  const q=Number($('exportQuality').value)||720,fps=Number($('exportFps').value)||30;
+  let w,h;if(state.ratio==='9:16'){h=q;w=Math.round(q*9/16)}else if(state.ratio==='1:1'){w=h=q}else{w=q===1080?1920:1280;h=q===1080?1080:720}
+  // For portrait, use 720x1280 / 1080x1920 rather than a tiny width.
+  if(state.ratio==='9:16'){w=q===1080?1080:720;h=q===1080?1920:1280}
+  canvas.width=w;canvas.height=h;
+  const mime=pickVideoMime();
+  if(!mime)return alert('這個瀏覽器沒有可用的 MP4 / WebM 錄製格式。');
+  const stream=canvas.captureStream(fps),chunks=[];
+  let rec;try{rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:q===1080?8_000_000:4_000_000})}catch(e){rec=new MediaRecorder(stream)}
+  rec.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};
+  const done=new Promise((resolve,reject)=>{rec.onstop=resolve;rec.onerror=e=>reject(e.error||e)});
+  $('exportBtn').disabled=true;$('exportProgress').style.width='0%';status('exportStatus','正在準備場景…');
+  try{
+    const loaded=[];for(const s of scenes)loaded.push({s,img:await waitImage(s.image)});
+    const total=loaded.reduce((a,x)=>a+Math.max(1,Number(x.s.duration)||1),0);let elapsed=0;
+    rec.start(1000);
+    for(const {s,img} of loaded){
+      const dur=Math.max(1,Number(s.duration)||1),frames=Math.max(1,Math.round(dur*fps));
+      for(let f=0;f<frames;f++){
+        const t=frames<=1?0:f/(frames-1);ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);
+        let zoom=1,pan=0;const m=String(s.motion||'');if(m.includes('推近'))zoom=1+.09*t;else if(m.includes('橫移')){zoom=1.06;pan=-1+2*t}else if(m.includes('拉遠'))zoom=1.09-.09*t;
+        drawCover(ctx,img,w,h,zoom,pan);drawSubtitle(ctx,s.subtitle,w,h);
+        await new Promise(r=>setTimeout(r,1000/fps));
+        const p=Math.min(100,((elapsed+(f+1)/fps)/total)*100);$('exportProgress').style.width=p+'%';
+      }
+      elapsed+=dur;
+    }
+    rec.stop();await done;
+    const actual=rec.mimeType||mime,blob=new Blob(chunks,{type:actual});
+    if(!blob.size)throw new Error('輸出檔案為空');
+    const ext=actual.includes('mp4')?'mp4':'webm',a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(state.name||'億家AI影片')+'.'+ext;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);
+    status('exportStatus',`影片完成：${ext.toUpperCase()}，約 ${(blob.size/1024/1024).toFixed(1)} MB`);$('exportProgress').style.width='100%';
+  }catch(e){console.error(e);status('exportStatus','影片輸出失敗：'+(e?.message||String(e)),true)}finally{$('exportBtn').disabled=false;stream.getTracks().forEach(t=>t.stop())}
+}
+
 loadLocal();render();initSB();applyStageRatio();
 </script></body></html>
